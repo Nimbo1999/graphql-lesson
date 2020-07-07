@@ -1,14 +1,44 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { useQuery } from '@apollo/react-hooks';
+import { gql } from 'apollo-boost';
 
+import Spinner from '../../components/spinner/spinner.component';
 import CollectionItem from '../../components/collection-item/collection-item.component';
-
-import { selectCollection } from '../../redux/shop/shop.selectors';
 
 import './collection.styles.scss';
 
-const CollectionPage = ({ collection }) => {
-  const { title, items } = collection;
+const GET_COLLECTION = gql`
+  query getCollectionsByTitle($title: String!) {
+    getCollectionsByTitle(title: $title) {
+      id,
+      title,
+      items {
+        id,
+        name,
+        price,
+        imageUrl
+      }
+    }
+  }
+`;
+
+const CollectionPage = ({ match }) => {
+  
+  const { params: { collectionId } } = match;
+
+  const { loading, data, error } = useQuery(GET_COLLECTION, {
+    variables: {
+      title: collectionId
+    }
+  });
+
+    console.log({loading});
+    console.log({data});
+    console.log({error});
+
+  if(loading) return <Spinner />
+  const { getCollectionsByTitle: { items, title } } = data;
+
   return (
     <div className='collection-page'>
       <h2 className='title'>{title}</h2>
@@ -21,8 +51,4 @@ const CollectionPage = ({ collection }) => {
   );
 };
 
-const mapStateToProps = (state, ownProps) => ({
-  collection: selectCollection(ownProps.match.params.collectionId)(state)
-});
-
-export default connect(mapStateToProps)(CollectionPage);
+export default CollectionPage;
