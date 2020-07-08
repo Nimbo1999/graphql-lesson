@@ -24,6 +24,12 @@ export const GET_CART_ITEMS = gql`
   }
 `;
 
+export const GET_ITEM_COUNTS = gql`
+  {
+    itemCount @client
+  }
+`;
+
 export const TOGGLE_CART_HIDDEN = gql`
   mutation ToggleCartHidden {
     toggleCartHidden @client
@@ -57,6 +63,15 @@ export const resolvers = {
       });
 
       const newCartItems = addItemToCart(cartItems, item);
+
+      cache.writeQuery({
+        query: GET_ITEM_COUNTS,
+        data: { itemCount: newCartItems.reduce(
+                (accumalatedQuantity, cartItem) =>
+                  accumalatedQuantity + cartItem.quantity,
+                0
+              )}
+      });
 
       cache.writeQuery({
         query: GET_CART_ITEMS,
