@@ -1,13 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { ADD_ITEM_TO_CART } from '../../graphql/resolvers';
+import { useMutation } from '@apollo/react-hooks';
 
 import CustomButton from '../custom-button/custom-button.component';
-import { addItem } from '../../redux/cart/cart.actions';
 
 import './collection-item.styles.scss';
 
-const CollectionItem = ({ item, addItem }) => {
+const CollectionItem = ({ item }) => {
   const { name, price, imageUrl } = item;
+
+  const [ addItemToCart ] = useMutation(ADD_ITEM_TO_CART);
 
   return (
     <div className='collection-item'>
@@ -21,18 +23,11 @@ const CollectionItem = ({ item, addItem }) => {
         <span className='name'>{name}</span>
         <span className='price'>{price}</span>
       </div>
-      <CustomButton onClick={() => addItem(item)} inverted>
+      <CustomButton onClick={() => addItemToCart({ variables: { item } })} inverted>
         Add to cart
       </CustomButton>
     </div>
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  addItem: item => dispatch(addItem(item))
-});
-
-export default connect(
-  null,
-  mapDispatchToProps
-)(CollectionItem);
+export default CollectionItem;

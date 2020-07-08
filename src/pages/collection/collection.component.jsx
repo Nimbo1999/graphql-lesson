@@ -23,7 +23,6 @@ const GET_COLLECTION = gql`
 `;
 
 const CollectionPage = ({ match }) => {
-  
   const { params: { collectionId } } = match;
 
   const { loading, data, error } = useQuery(GET_COLLECTION, {
